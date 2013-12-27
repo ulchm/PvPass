@@ -32,7 +32,7 @@ public class PVPass extends JavaPlugin {
         player.sendMessage("Enabling PVP");
         this.getServer().broadcastMessage("PVP has been enabled for " + player.getName() + ".");
         PlayerID.savePlayerData(this.getName(), player, cfg);
-        player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
+        player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, true));
     }
 
     /***

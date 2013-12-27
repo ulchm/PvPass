@@ -27,8 +27,16 @@ public class PVPListener implements Listener {
             }
             if (attacker != null) {
                 Player victim = (Player) event.getEntity();
-            }
 
+                if (!plugin.IsPvPEnabled(victim)) {
+                    event.setCancelled(true);
+                } else if (plugin.IsPvPEnabled(victim)) {
+                    plugin.EnablePvP(attacker);
+                    plugin.EnablePvP(victim);
+                    return;
+                }
+
+            }
         }
     }
 

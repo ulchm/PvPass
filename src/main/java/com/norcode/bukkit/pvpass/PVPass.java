@@ -19,13 +19,13 @@ public class PVPass extends JavaPlugin {
      * @param player - Player to have PVP enabled.
      */
     public void EnablePvP(Player player) {
+        ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
         if (IsPvPEnabled(player)) {
-            player.sendMessage("PVP is already enabled");
+            cfg.set("pvp-cooldown", System.currentTimeMillis() + 60000);
             return;
         }
 
-       ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
-
+        cfg.set("pvp-cooldown", System.currentTimeMillis() + 60000);
         cfg.set("pvp-enabled", true);
         player.setDisplayName(ChatColor.RED + player.getName());
         player.setPlayerListName(ChatColor.RED + player.getName());
@@ -41,7 +41,6 @@ public class PVPass extends JavaPlugin {
      */
     public void DisablePvP(Player player) {
         if (!IsPvPEnabled(player)) {
-            player.sendMessage("PVP is already disabled");
             return;
         }
 
@@ -52,7 +51,6 @@ public class PVPass extends JavaPlugin {
         }
 
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
-        cfg.set("pvp-cooldown", System.currentTimeMillis() + 60000);
         cfg.set("pvp-enabled", false);
         player.setDisplayName(player.getName());
         player.setPlayerListName(player.getName());

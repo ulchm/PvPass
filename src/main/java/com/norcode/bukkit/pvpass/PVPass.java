@@ -1,6 +1,7 @@
 package com.norcode.bukkit.pvpass;
 
 import com.norcode.bukkit.playerid.PlayerID;
+import com.norcode.bukkit.pvpass.commands.PVPCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ public class PVPass extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PVPListener(this), this);
+        getServer().getPluginCommand("pvp").setExecutor(new PVPCommand(this));
     }
 
     /***
@@ -21,14 +23,16 @@ public class PVPass extends JavaPlugin {
     public void EnablePvP(Player player) {
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
         if (IsPvPEnabled(player)) {
-            cfg.set("pvp-cooldown", System.currentTimeMillis() + 60000);
+            cfg.set("pvp-cooldown", System.currentTimeMillis() + (5*60*1000));
+            PlayerID.savePlayerData(this.getName(), player, cfg);
             return;
         }
 
-        cfg.set("pvp-cooldown", System.currentTimeMillis() + 60000);
+        cfg.set("pvp-cooldown", System.currentTimeMillis() + (5*60*1000));
         cfg.set("pvp-enabled", true);
-        player.setDisplayName(ChatColor.RED + player.getName());
-        player.setPlayerListName(ChatColor.RED + player.getName());
+        player.setDisplayName(ChatColor.RED + player.getName() + ChatColor.RESET);
+        /* TO-DO:  CHOP THIS AT 16 */
+        //player.setPlayerListName(ChatColor.RED + player.getName() + ChatColor.RESET);
         player.sendMessage("Enabling PVP");
         this.getServer().broadcastMessage("PVP has been enabled for " + player.getName() + ".");
         PlayerID.savePlayerData(this.getName(), player, cfg);

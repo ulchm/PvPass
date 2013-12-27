@@ -2,6 +2,7 @@ authors: ${project.authors}
 name: ${project.name}
 version: ${project.version}
 depend: ${project.dependencies}
+softdepend: ${project.softdependencies}
 main: ${project.main}
 database: true
 

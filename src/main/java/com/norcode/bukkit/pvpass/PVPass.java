@@ -13,6 +13,10 @@ public class PVPass extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PVPListener(this), this);
+		if (getServer().getPluginManager().getPlugin("TagAPI") != null) {
+			getLogger().info("TagAPI Found, colored nametags enabled.");
+			getServer().getPluginManager().registerEvents(new TagListener(this), this);
+		}
         getServer().getPluginCommand("pvp").setExecutor(new PVPCommand(this));
     }
 
@@ -30,9 +34,6 @@ public class PVPass extends JavaPlugin {
 
         cfg.set("pvp-cooldown", System.currentTimeMillis() + (5*60*1000));
         cfg.set("pvp-enabled", true);
-        player.setDisplayName(ChatColor.RED + player.getName() + ChatColor.RESET);
-        /* TO-DO:  CHOP THIS AT 16 */
-        //player.setPlayerListName(ChatColor.RED + player.getName() + ChatColor.RESET);
         player.sendMessage("Enabling PVP");
         this.getServer().broadcastMessage("PVP has been enabled for " + player.getName() + ".");
         PlayerID.savePlayerData(this.getName(), player, cfg);
@@ -56,8 +57,6 @@ public class PVPass extends JavaPlugin {
 
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
         cfg.set("pvp-enabled", false);
-        player.setDisplayName(player.getName());
-        player.setPlayerListName(player.getName());
         player.sendMessage("Disabling PVP");
         PlayerID.savePlayerData(this.getName(), player, cfg);
         player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));

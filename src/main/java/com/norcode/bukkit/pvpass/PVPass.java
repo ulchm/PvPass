@@ -32,7 +32,7 @@ public class PVPass extends JavaPlugin {
         player.sendMessage("Enabling PVP");
         this.getServer().broadcastMessage("PVP has been enabled for " + player.getName() + ".");
         PlayerID.savePlayerData(this.getName(), player, cfg);
-		player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
+        player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
     }
 
     /***
@@ -57,8 +57,8 @@ public class PVPass extends JavaPlugin {
         player.setDisplayName(player.getName());
         player.setPlayerListName(player.getName());
         player.sendMessage("Disabling PVP");
-		PlayerID.savePlayerData(this.getName(), player, cfg);
-		player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
+        PlayerID.savePlayerData(this.getName(), player, cfg);
+        player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
     }
 
     /***
@@ -67,12 +67,12 @@ public class PVPass extends JavaPlugin {
      * @return bool - True if PVP is enabled, False if PVP is disabled
      */
     public boolean IsPvPEnabled(Player player) {
-		if (!player.hasMetadata("pvpass-pvp-enabled")) {
-        	ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
-        	boolean enabled = cfg.getBoolean("pvp-enabled", false);
-			player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, enabled));
-		}
-		return player.getMetadata("pvpass-pvp-enabled").get(0).asBoolean();
+        if (!player.hasMetadata("pvpass-pvp-enabled")) {
+            ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
+            boolean enabled = cfg.getBoolean("pvp-enabled", false);
+            player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, enabled));
+        }
+        return player.getMetadata("pvpass-pvp-enabled").get(0).asBoolean();
     }
 
     /***

@@ -1,0 +1,5 @@
+enabled: 'Your PVP has been enabled!'
+enabled-other: 'PVP has been enabled on {0}.  Game on!'
+enabled-already: 'Your PVP is already enabled'
+no-previous-location: '&4You have no previous location to return to.'
+available-warps: '&fAvailable Warps &6[&7pg.{0} of {1}&6]'

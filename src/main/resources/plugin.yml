@@ -1,0 +1,17 @@
+authors: ${project.authors}
+name: ${project.name}
+version: ${project.version}
+depend: ${project.dependencies}
+main: ${project.main}
+database: true
+
+commands:
+  pvp:
+
+permissions:
+  pvpass.admin:
+    default: op
+    children:
+      pvpass.command: true
+      pvpass.command.enable: true
+      pvpass.command.disable: true

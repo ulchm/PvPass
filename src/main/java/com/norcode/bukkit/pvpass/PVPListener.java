@@ -1,11 +1,17 @@
 package com.norcode.bukkit.pvpass;
 
+import com.norcode.bukkit.playerid.PlayerID;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PVPListener implements Listener {
     private final PVPass plugin;
@@ -41,8 +47,52 @@ public class PVPListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if  ((plugin.IsPvPEnabled(player)) && ((plugin.GetPvPCooldown(player) - System.currentTimeMillis() * (plugin.getConfig().getLong("pvp-cooldown", 300) * 1000)) > (plugin.getConfig().getLong("disconnect-slay-time", 15)))) {
+            plugin.getServer().broadcastMessage(plugin.getMsg("logged-out-combat", player.getName()));
+            final Location loc = event.getPlayer().getLocation();
+            for (int i=0;i<5;i++) {
+                plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        loc.getWorld().strikeLightningEffect(loc);
+                    }
+                }, i*5);
+            }
+            player.setHealth(0);
+            ConfigurationSection cfg = PlayerID.getPlayerData(plugin.getName(), player);
+            cfg.set("pvp-join-message", plugin.getMsg("player-logged-out-combat"));
+            PlayerID.savePlayerData(plugin.getName(), player, cfg);
+        }
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        ConfigurationSection cfg = PlayerID.getPlayerData(plugin.getName(), player);
+        String message = cfg.getString("pvp-join-message");
+
+        if (message != null) {
+            player.sendMessage(message);
+            cfg.set("pvp-join-message", null);
+            PlayerID.savePlayerData(plugin.getName(), player, cfg);
+        }
+
+        if (plugin.IsPvPEnabled(player)){
+            player.sendMessage(plugin.getMsg("join-enabled"));
+            return;
+        }
+        player.sendMessage(plugin.getMsg("join-disabled"));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        if (player.getKiller() != null) {
+            plugin.DisablePvP(player);
+        }
     }
 
 }

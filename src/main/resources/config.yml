@@ -1,1 +1,3 @@
 debug: true
+disconnect-slay-time: 15 #time in seconds a player must be disengaged before logging out
+pvp-cooldown: 300 #time in seconds a player must be disengaged before disabling pvp

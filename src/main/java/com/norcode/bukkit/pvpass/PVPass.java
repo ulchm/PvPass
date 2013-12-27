@@ -2,16 +2,26 @@ package com.norcode.bukkit.pvpass;
 
 import com.norcode.bukkit.playerid.PlayerID;
 import com.norcode.bukkit.pvpass.commands.PVPCommand;
+import com.norcode.bukkit.pvpass.util.ConfigAccessor;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.kitteh.tag.TagAPI;
+
+import java.text.MessageFormat;
 
 public class PVPass extends JavaPlugin {
+    private ConfigAccessor messages;
 
     @Override
     public void onEnable() {
+        messages = new ConfigAccessor(this, "messages.yml");
+        messages.getConfig();
+        messages.saveDefaultConfig();
+        messages.getConfig().options().copyDefaults(true);
+        messages.saveConfig();
         getServer().getPluginManager().registerEvents(new PVPListener(this), this);
 		if (getServer().getPluginManager().getPlugin("TagAPI") != null) {
 			getLogger().info("TagAPI Found, colored nametags enabled.");
@@ -27,17 +37,18 @@ public class PVPass extends JavaPlugin {
     public void EnablePvP(Player player) {
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
         if (IsPvPEnabled(player)) {
-            cfg.set("pvp-cooldown", System.currentTimeMillis() + (5*60*1000));
+            cfg.set("pvp-cooldown", System.currentTimeMillis() + (getConfig().getLong("pvp-cooldown", 300) * 1000));
             PlayerID.savePlayerData(this.getName(), player, cfg);
             return;
         }
 
-        cfg.set("pvp-cooldown", System.currentTimeMillis() + (5*60*1000));
+        cfg.set("pvp-cooldown", System.currentTimeMillis() + (getConfig().getLong("pvp-cooldown", 300) * 1000));
         cfg.set("pvp-enabled", true);
-        player.sendMessage("Enabling PVP");
-        this.getServer().broadcastMessage("PVP has been enabled for " + player.getName() + ".");
+        player.sendMessage(getMsg("pvp-enabled"));
+        this.getServer().broadcastMessage(getMsg("pvp-enabled-other", player.getName()));
         PlayerID.savePlayerData(this.getName(), player, cfg);
         player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, true));
+        TagAPI.refreshPlayer(player);
     }
 
     /***
@@ -51,15 +62,16 @@ public class PVPass extends JavaPlugin {
 
         Long cooldown = GetPvPCooldown(player);
         if (cooldown > 0) {
-            player.sendMessage("You need to wait " + cooldown + "s before you can disable pvp.");
+            player.sendMessage(getMsg("cooldown-required", cooldown));
             return;
         }
 
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
         cfg.set("pvp-enabled", false);
-        player.sendMessage("Disabling PVP");
+        player.sendMessage(getMsg("pvp-disabled"));
         PlayerID.savePlayerData(this.getName(), player, cfg);
         player.setMetadata("pvpass-pvp-enabled", new FixedMetadataValue(this, false));
+        TagAPI.refreshPlayer(player);
     }
 
     /***
@@ -82,12 +94,41 @@ public class PVPass extends JavaPlugin {
      * @return long that is the number of seconds before the cooldown is up.
      */
     public long GetPvPCooldown(Player player) {
+        if (player.hasPermission("pvpass.cooldown.override")) { return 0; }
         ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
-        Long cooldown =  cfg.getLong("pvp-cooldown", System.currentTimeMillis()-60000);
+        Long cooldown =  cfg.getLong("pvp-cooldown", System.currentTimeMillis()-(getConfig().getLong("pvp-cooldown", 300) * 1000));
         if (cooldown < System.currentTimeMillis()) {
             return 0;
         } else {
             return (cooldown - System.currentTimeMillis()) / 1000;
         }
+    }
+
+    /***
+     * Resets the PvP cooldown for a player
+     * @param player - The player to be reset
+     */
+    public void ResetPvPCooldown(Player player) {
+        ConfigurationSection cfg = PlayerID.getPlayerData(this.getName(), player);
+        cfg.set("pvp-cooldown", System.currentTimeMillis() - (getConfig().getLong("pvp-cooldown", 300) * 1000));
+        PlayerID.savePlayerData(this.getName(), player, cfg);
+    }
+
+
+    /***
+     * Loads messages from yml and parses for display
+     * @param key
+     * @param args
+     * @return
+     */
+    public String getMsg(String key, Object... args) {
+        String tpl = messages.getConfig().getString(key);
+        if (tpl == null) {
+            tpl = "[" + key + "] ";
+            for (int i = 0; i < args.length; i++) {
+                tpl += "{" + i + "}, ";
+            }
+        }
+        return new MessageFormat(ChatColor.translateAlternateColorCodes('&', tpl)).format(args);
     }
 }

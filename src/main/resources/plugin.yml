@@ -16,3 +16,4 @@ permissions:
       pvpass.command: true
       pvpass.command.enable: true
       pvpass.command.disable: true
+      pvpass.cooldown.override: false

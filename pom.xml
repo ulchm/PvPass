@@ -12,6 +12,7 @@
         <project.authors>[ulchm]</project.authors>
         <project.main>com.norcode.bukkit.pvpass.PVPass</project.main>
         <project.description>Player pvp toggling.</project.description>
+        <project.softdependencies>[TagAPI]</project.softdependencies>
         <project.dependencies>[PlayerID]</project.dependencies>
     </properties>
 
@@ -39,6 +40,10 @@
             <id>bukkit-release-repo</id>
             <url>http://repo.bukkit.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>tagapi-repo</id>
+            <url>http://repo.kitteh.org/content/repositories/public/</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -51,6 +56,11 @@
             <artifactId>PlayerID</artifactId>
             <version>1.2</version>
         </dependency>
+       <dependency>
+           <groupId>org.kitteh</groupId>
+           <artifactId>tagapi</artifactId>
+           <version>RELEASE</version>
+       </dependency>
     </dependencies>
 
 </project>

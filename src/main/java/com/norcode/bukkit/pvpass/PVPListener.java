@@ -4,6 +4,7 @@ import com.norcode.bukkit.playerid.PlayerID;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
@@ -80,46 +81,47 @@ public class PVPListener implements Listener {
 
     @EventHandler(ignoreCancelled=true)
     public void onPotionSplashEvent(PotionSplashEvent event) {
-        if (event.getEntity() instanceof Player) {
-            Player attacker = null;
-            Boolean isHarmful = false;
-            ThrownPotion potion = event.getPotion();
-            //filter out harmful effects
-            Set<PotionEffectType> harmfulPotionEffectTypes = new HashSet<PotionEffectType>();
-            harmfulPotionEffectTypes.add(PotionEffectType.BLINDNESS);
-            harmfulPotionEffectTypes.add(PotionEffectType.CONFUSION);
-            harmfulPotionEffectTypes.add(PotionEffectType.HARM);
-            harmfulPotionEffectTypes.add(PotionEffectType.POISON);
-            harmfulPotionEffectTypes.add(PotionEffectType.SLOW);
-            harmfulPotionEffectTypes.add(PotionEffectType.SLOW_DIGGING);
-            harmfulPotionEffectTypes.add(PotionEffectType.HUNGER);
-            harmfulPotionEffectTypes.add(PotionEffectType.WEAKNESS);
-            harmfulPotionEffectTypes.add(PotionEffectType.WITHER);
 
-            for (PotionEffect e: potion.getEffects()) {
-                if (harmfulPotionEffectTypes.contains(e.getType())) {
-                     isHarmful = true;
-                     break;
-                }
-            }
+        Player attacker = null;
+        Boolean affectedPlayer = false;
+        Boolean isHarmful = false;
+        ThrownPotion potion = event.getPotion();
 
-            if (!isHarmful) return;
+        //get the shooter and verify it was a player
+        if (potion.getShooter() instanceof Player) {
+            attacker = (Player) potion.getShooter();
+        }
 
-            if (potion.getShooter() instanceof Player) {
-                attacker = (Player) potion.getShooter();
-            }
-
-            if (attacker != null) {
-                Player victim = (Player) event.getEntity();
-                if (!plugin.IsPvPEnabled(victim)) {
-                    event.setCancelled(true);
-                } else if (plugin.IsPvPEnabled(victim)) {
-                    plugin.EnablePvP(attacker);
-                    plugin.EnablePvP(victim);
-                    return;
-                }
+        //loop through affected entities,  figure out if any have pvp enabled (other then attacker)
+        for (Entity e: event.getAffectedEntities()) {
+            if ((e instanceof Player) && (plugin.IsPvPEnabled((Player) e) && ((Player) e != attacker)))  {
+                affectedPlayer = true;
+                break;
             }
         }
+
+        plugin.getLogger().info("Potion thrown by " + potion.getShooter() + "! Type is: " + potion.getType());
+
+        //filter out harmful effects
+        Set<PotionEffectType> harmfulPotionEffectTypes = new HashSet<PotionEffectType>();
+        harmfulPotionEffectTypes.add(PotionEffectType.BLINDNESS);
+        harmfulPotionEffectTypes.add(PotionEffectType.CONFUSION);
+        harmfulPotionEffectTypes.add(PotionEffectType.HARM);
+        harmfulPotionEffectTypes.add(PotionEffectType.POISON);
+        harmfulPotionEffectTypes.add(PotionEffectType.SLOW);
+        harmfulPotionEffectTypes.add(PotionEffectType.SLOW_DIGGING);
+        harmfulPotionEffectTypes.add(PotionEffectType.HUNGER);
+        harmfulPotionEffectTypes.add(PotionEffectType.WEAKNESS);
+        harmfulPotionEffectTypes.add(PotionEffectType.WITHER);
+
+        for (PotionEffect e: potion.getEffects()) {
+            if (harmfulPotionEffectTypes.contains(e.getType())) {
+                 isHarmful = true;
+                 break;
+            }
+        }
+
+        if ((attacker == null) || (!isHarmful) || (!affectedPlayer)) return;
     }
 
 

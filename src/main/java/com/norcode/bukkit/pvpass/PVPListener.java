@@ -6,12 +6,16 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.Potion;
 
 public class PVPListener implements Listener {
     private final PVPass plugin;
@@ -33,7 +37,6 @@ public class PVPListener implements Listener {
             }
             if (attacker != null) {
                 Player victim = (Player) event.getEntity();
-
                 if (!plugin.IsPvPEnabled(victim)) {
                     event.setCancelled(true);
                 } else if (plugin.IsPvPEnabled(victim)) {
@@ -45,6 +48,55 @@ public class PVPListener implements Listener {
             }
         }
     }
+
+    @EventHandler(ignoreCancelled=true)
+    public void onEntityCombustEntityEvent(EntityCombustByEntityEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player attacker = null;
+            if (event.getCombuster() instanceof Player) {
+                attacker = (Player) event.getCombuster();
+            } else if (event.getCombuster() instanceof Projectile) {
+                if (((Projectile) event.getCombuster()).getShooter() instanceof Player) {
+                    attacker = (Player) ((Projectile) event.getCombuster()).getShooter();
+                }
+            }
+            if (attacker != null) {
+                Player victim = (Player) event.getEntity();
+                if (!plugin.IsPvPEnabled(victim)) {
+                    event.setCancelled(true);
+                } else if (plugin.IsPvPEnabled(victim)) {
+                    plugin.EnablePvP(attacker);
+                    plugin.EnablePvP(victim);
+                    return;
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled=true)
+    public void onPotionSplashEvent(PotionSplashEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player attacker = null;
+            ThrownPotion potion = event.getPotion();
+            potion.getShooter();
+
+            if (potion.getShooter() instanceof Player) {
+                attacker = (Player) potion.getShooter();
+            }
+
+            if (attacker != null) {
+                Player victim = (Player) event.getEntity();
+                if (!plugin.IsPvPEnabled(victim)) {
+                    event.setCancelled(true);
+                } else if (plugin.IsPvPEnabled(victim)) {
+                    plugin.EnablePvP(attacker);
+                    plugin.EnablePvP(victim);
+                    return;
+                }
+            }
+        }
+    }
+
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent event) {

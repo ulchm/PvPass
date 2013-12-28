@@ -172,8 +172,8 @@ public class PVPListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         if (player.getKiller() != null) {
+            plugin.ResetPvPCooldown(player);
             plugin.DisablePvP(player);
         }
     }
-
 }

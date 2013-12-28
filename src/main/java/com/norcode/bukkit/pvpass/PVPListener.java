@@ -35,7 +35,9 @@ public class PVPListener implements Listener {
     @EventHandler(ignoreCancelled=true)
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
         if (event.getEntity() instanceof Player) {
+
             Player attacker = null;
+
             if (event.getDamager() instanceof Player) {
                 attacker = (Player) event.getDamager();
             } else if (event.getDamager() instanceof Projectile) {

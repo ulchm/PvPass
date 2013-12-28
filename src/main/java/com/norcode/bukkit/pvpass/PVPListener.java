@@ -16,6 +16,11 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class PVPListener implements Listener {
     private final PVPass plugin;
@@ -77,8 +82,28 @@ public class PVPListener implements Listener {
     public void onPotionSplashEvent(PotionSplashEvent event) {
         if (event.getEntity() instanceof Player) {
             Player attacker = null;
+            Boolean isHarmful = false;
             ThrownPotion potion = event.getPotion();
-            potion.getShooter();
+            //filter out harmful effects
+            Set<PotionEffectType> harmfulPotionEffectTypes = new HashSet<PotionEffectType>();
+            harmfulPotionEffectTypes.add(PotionEffectType.BLINDNESS);
+            harmfulPotionEffectTypes.add(PotionEffectType.CONFUSION);
+            harmfulPotionEffectTypes.add(PotionEffectType.HARM);
+            harmfulPotionEffectTypes.add(PotionEffectType.POISON);
+            harmfulPotionEffectTypes.add(PotionEffectType.SLOW);
+            harmfulPotionEffectTypes.add(PotionEffectType.SLOW_DIGGING);
+            harmfulPotionEffectTypes.add(PotionEffectType.HUNGER);
+            harmfulPotionEffectTypes.add(PotionEffectType.WEAKNESS);
+            harmfulPotionEffectTypes.add(PotionEffectType.WITHER);
+
+            for (PotionEffect e: potion.getEffects()) {
+                if (harmfulPotionEffectTypes.contains(e.getType())) {
+                     isHarmful = true;
+                     break;
+                }
+            }
+
+            if (!isHarmful) return;
 
             if (potion.getShooter() instanceof Player) {
                 attacker = (Player) potion.getShooter();

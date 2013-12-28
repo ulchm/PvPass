@@ -44,7 +44,9 @@ public class PVPListener implements Listener {
             if (attacker != null) {
                 Player victim = (Player) event.getEntity();
                 if (!plugin.IsPvPEnabled(victim)) {
-                    event.setCancelled(true);
+                    event.setDamage(0);
+                    victim.setVelocity(attacker.getLocation().getDirection().multiply(2));
+                    victim.sendMessage(plugin.getMsg("attacked-pvp-disabled"));
                 } else if (plugin.IsPvPEnabled(victim)) {
                     plugin.EnablePvP(attacker);
                     plugin.EnablePvP(victim);

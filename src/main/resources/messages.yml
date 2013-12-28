@@ -8,4 +8,4 @@ join-enabled: '&2«&9PvPass&2» &4Your PvP is &3enabled&4.  You can disable it b
 join-disabled: '&2«&9PvPass&2» &4Your PvP is disabled.  You can enable it by typing "/pvp on" if someone needs a smack.'
 status-enabled: '&2«&9PvPass&2» &4Your PvP is &3enabled&4!  You must wait &3{0}s &4without combat before you can disable it with "/pvp off".'
 status-disabled: '&2«&9PvPass&2» &4Your PvP is disabled.  You can enable it with "/pvp on" if someone needs a smack.'
-
+attacked-pvp-disabled: '&2«&9PvPass&2» &4You have been attacked by a player with PvP enabled.  You should leave him alone or you will be flagged.'

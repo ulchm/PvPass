@@ -1,3 +1,4 @@
 debug: true
 disconnect-slay-time: 15 #time in seconds a player must be disengaged before logging out
 pvp-cooldown: 300 #time in seconds a player must be disengaged before disabling pvp
+min-reward-level: 15 #the minimum level a player must be before reward chances are issued.

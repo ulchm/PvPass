@@ -2,6 +2,7 @@ package com.norcode.bukkit.pvpass;
 
 import com.norcode.bukkit.playerid.PlayerID;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -17,10 +18,13 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -183,9 +187,23 @@ public class PVPListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+
         if (player.getKiller() != null) {
             plugin.ResetPvPCooldown(player);
             plugin.DisablePvP(player);
+            player.getKiller().sendMessage(plugin.getMsg("killed-player", player.getName()));
+            player.sendMessage(plugin.getMsg("killed-by-player", player.getKiller().getName()));
+            if (player.getLevel() >= plugin.getConfig().getInt("min-reward-level")) {
+                ItemStack stack = new ItemStack(Material.SKULL_ITEM, 1, (byte) 3);
+                SkullMeta meta = (SkullMeta) stack.getItemMeta();
+                meta.setOwner(player.getName());
+                stack.setItemMeta(meta);
+                HashMap<Integer, ItemStack> response = player.getKiller().getInventory().addItem(stack);
+                if (response.size() != 0) {
+                    plugin.getServer().getWorld(player.getWorld().getName()).dropItem(player.getLocation(), response.get(0));
+                    player.getKiller().sendMessage(plugin.getMsg("inventory-full"));
+                }
+            }
         }
     }
 }

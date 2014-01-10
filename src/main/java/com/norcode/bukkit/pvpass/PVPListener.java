@@ -1,11 +1,8 @@
 package com.norcode.bukkit.pvpass;
 
-import com.norcode.bukkit.playerid.PlayerID;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -20,13 +17,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class PVPListener implements Listener {
@@ -158,9 +153,8 @@ public class PVPListener implements Listener {
                 }, i*5);
             }
             player.setHealth(0);
-            ConfigurationSection cfg = PlayerID.getPlayerData(plugin.getName(), player);
+            ConfigurationSection cfg = plugin.getPlayerData(player);
             cfg.set("pvp-join-message", plugin.getMsg("player-logged-out-combat"));
-            PlayerID.savePlayerData(plugin.getName(), player, cfg);
         }
 
     }
@@ -168,13 +162,12 @@ public class PVPListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        ConfigurationSection cfg = PlayerID.getPlayerData(plugin.getName(), player);
+        ConfigurationSection cfg = plugin.getPlayerData(player);
         String message = cfg.getString("pvp-join-message");
 
         if (message != null) {
             player.sendMessage(message);
             cfg.set("pvp-join-message", null);
-            PlayerID.savePlayerData(plugin.getName(), player, cfg);
         }
 
         if (plugin.IsPvPEnabled(player)){

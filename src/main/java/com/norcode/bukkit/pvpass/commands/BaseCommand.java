@@ -1,6 +1,6 @@
 package com.norcode.bukkit.pvpass.commands;
 
-import com.norcode.bukkit.playerid.command.CommandError;
+import com.norcode.bukkit.metalcore.command.CommandError;
 import com.norcode.bukkit.pvpass.PVPass;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
